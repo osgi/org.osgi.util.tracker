@@ -1,5 +1,5 @@
 Bundle-Description: TB4 for service tracker test case
-Bundle-Activator: $(p).tb4.TB4Activator
+Bundle-Activator: ${p}.tb4.TB4Activator
 -privatepackage: ${p}.tb4
 
 

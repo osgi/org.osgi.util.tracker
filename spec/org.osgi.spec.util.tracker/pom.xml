@@ -12,7 +12,7 @@
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<artifactId>org.osgi.spec.util.tracker</artifactId>
-	<name>OSGi Specification repo for org.osgi.util.tracker</name>
+	<name>OSGi Tracker Specification</name>
 
 	<dependencies>
 		<dependency>

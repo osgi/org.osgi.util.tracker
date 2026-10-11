@@ -18,166 +18,182 @@
 
 package org.osgi.test.cases.tracker.junit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.Test;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.test.support.OSGiTestCase;
-import org.osgi.test.support.wiring.Wiring;
+import org.osgi.framework.wiring.FrameworkWiring;
+import org.osgi.test.common.annotation.InjectBundleContext;
+import org.osgi.test.common.annotation.InjectBundleInstaller;
+import org.osgi.test.common.install.BundleInstaller;
 import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 
-public class BundleTrackerTests extends OSGiTestCase {
+public class BundleTrackerTests {
 
+	@InjectBundleContext
+	BundleContext		context;
+
+	@InjectBundleInstaller
+	BundleInstaller		installer;
+
+	@Test
 	public void testOpenClose() {
-		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(getContext(),
+		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(context,
 				Bundle.ACTIVE, null);
 		int size = bt.size();
-		assertEquals("size not zero", 0, size);
+		assertThat(size).as("size not zero").isZero();
 		Bundle[] bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 
 		bt.open();
 		try {
 			size = bt.size();
-			assertTrue("size zero", 0 < size);
+			assertThat(0 < size).as("size zero").isTrue();
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
-			assertEquals("size() != getBundles().length", size, bundles.length);
+			assertThat(bundles).as("getBundles() null").isNotNull();
+			assertThat(bundles.length).as("size() != getBundles().length").isEqualTo(size);
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				Object tracked = bt.getObject(bundle);
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			Map<Bundle, Bundle> map = bt.getTracked();
-			assertEquals("size() != map.size()", size, map.size());
+			assertThat(map).as("size() != map.size()").hasSize(size);
 			for (Map.Entry<Bundle, Bundle> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				Object tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 		}
 		finally {
 			bt.close();
 		}
 		size = bt.size();
-		assertEquals("size not zero", 0, size);
+		assertThat(size).as("size not zero").isZero();
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		Map<Bundle, Bundle> map = bt.getTracked();
-		assertEquals("size() != map.size()", size, map.size());
+		assertThat(map).as("size() != map.size()").hasSize(size);
 
 		bt.open();
 		try {
 			size = bt.size();
-			assertTrue("size zero", 0 < size);
+			assertThat(0 < size).as("size zero").isTrue();
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
-			assertEquals("size() != getBundles().length", size, bundles.length);
+			assertThat(bundles).as("getBundles() null").isNotNull();
+			assertThat(bundles.length).as("size() != getBundles().length").isEqualTo(size);
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				Object tracked = bt.getObject(bundle);
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			map = bt.getTracked();
-			assertEquals("size() != map.size()", size, map.size());
+			assertThat(map).as("size() != map.size()").hasSize(size);
 			for (Map.Entry<Bundle, Bundle> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				Object tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 		}
 		finally {
 			bt.close();
 		}
 		size = bt.size();
-		assertEquals("size not zero", 0, size);
+		assertThat(size).as("size not zero").isZero();
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		map = bt.getTracked();
-		assertEquals("size() != map.size()", size, map.size());
+		assertThat(map).as("size() != map.size()").hasSize(size);
 	}
 
 	// add testing for isEmpty
+	@Test
 	public void testOpenClose2() {
-		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(getContext(),
+		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(context,
 				Bundle.ACTIVE, null);
 		int size = bt.size();
-		assertEquals("size not zero", 0, size);
-		assertTrue("not empty", bt.isEmpty());
+		assertThat(size).as("size not zero").isZero();
+		assertThat(bt.isEmpty()).as("not empty").isTrue();
 		Bundle[] bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 
 		bt.open();
 		try {
 			size = bt.size();
-			assertTrue("size zero", 0 < size);
-			assertFalse("empty", bt.isEmpty());
+			assertThat(0 < size).as("size zero").isTrue();
+			assertThat(bt.isEmpty()).as("empty").isFalse();
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
-			assertEquals("size() != getBundles().length", size, bundles.length);
+			assertThat(bundles).as("getBundles() null").isNotNull();
+			assertThat(bundles.length).as("size() != getBundles().length").isEqualTo(size);
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				Object tracked = bt.getObject(bundle);
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			Map<Bundle, Bundle> map = bt.getTracked();
-			assertEquals("size() != map.size()", size, map.size());
+			assertThat(map).as("size() != map.size()").hasSize(size);
 			for (Map.Entry<Bundle, Bundle> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				Object tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 		}
 		finally {
 			bt.close();
 		}
 		size = bt.size();
-		assertEquals("size not zero", 0, size);
-		assertTrue("not empty", bt.isEmpty());
+		assertThat(size).as("size not zero").isZero();
+		assertThat(bt.isEmpty()).as("not empty").isTrue();
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		Map<Bundle, Bundle> map = bt.getTracked();
-		assertEquals("size() != map.size()", size, map.size());
+		assertThat(map).as("size() != map.size()").hasSize(size);
 
 		bt.open();
 		try {
 			size = bt.size();
-			assertTrue("size zero", 0 < size);
-			assertFalse("empty", bt.isEmpty());
+			assertThat(0 < size).as("size zero").isTrue();
+			assertThat(bt.isEmpty()).as("empty").isFalse();
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
-			assertEquals("size() != getBundles().length", size, bundles.length);
+			assertThat(bundles).as("getBundles() null").isNotNull();
+			assertThat(bundles.length).as("size() != getBundles().length").isEqualTo(size);
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				Object tracked = bt.getObject(bundle);
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			map = bt.getTracked();
-			assertEquals("size() != map.size()", size, map.size());
+			assertThat(map).as("size() != map.size()").hasSize(size);
 			for (Map.Entry<Bundle, Bundle> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				Object tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked);
+				assertThat(tracked).as("default tracked != bundle").isEqualTo(bundle);
 			}
 		}
 		finally {
 			bt.close();
 		}
 		size = bt.size();
-		assertEquals("size not zero", 0, size);
+		assertThat(size).as("size not zero").isZero();
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		map = bt.getTracked();
-		assertEquals("size() != map.size()", size, map.size());
+		assertThat(map).as("size() != map.size()").hasSize(size);
 	}
 
+	@Test
 	public void testCustomizer() throws Exception {
 		final boolean[] customizerCalled = new boolean[] {false, false, false};
 		BundleTracker<BundleWrapper> bt = new BundleTracker<BundleWrapper>(
-				getContext(), Bundle.ACTIVE,
+				context, Bundle.ACTIVE,
 				new BundleTrackerCustomizer<BundleWrapper>() {
 
 					public BundleWrapper addingBundle(Bundle bundle,
@@ -206,10 +222,11 @@ public class BundleTrackerTests extends OSGiTestCase {
 		testCustomizerInternal(bt, customizerCalled);
 	}
 
+	@Test
 	public void testSubclass() throws Exception {
 		final boolean[] customizerCalled = new boolean[] {false, false, false};
 		BundleTracker<BundleWrapper> bt = new BundleTracker<BundleWrapper>(
-				getContext(), Bundle.ACTIVE, null) {
+				context, Bundle.ACTIVE, null) {
 
 			public BundleWrapper addingBundle(Bundle bundle, BundleEvent event) {
 				synchronized (customizerCalled) {
@@ -238,107 +255,107 @@ public class BundleTrackerTests extends OSGiTestCase {
 	private void testCustomizerInternal(BundleTracker<BundleWrapper> bt,
 			boolean[] customizerCalled) throws Exception {
 		synchronized (customizerCalled) {
-			assertFalse("adding called", customizerCalled[0]);
-			assertFalse("modified called", customizerCalled[1]);
-			assertFalse("removed called", customizerCalled[2]);
+			assertThat(customizerCalled[0]).as("adding called").isFalse();
+			assertThat(customizerCalled[1]).as("modified called").isFalse();
+			assertThat(customizerCalled[2]).as("removed called").isFalse();
 		}
 
 		Bundle[] bundles;
 		bt.open();
 		try {
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
+			assertThat(bundles).as("getBundles() null").isNotNull();
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				BundleWrapper tracked = bt.getObject(bundle);
-				assertEquals("tracked.getBundle() != bundle", bundle, tracked
-						.getBundle());
+				assertThat(tracked
+						.getBundle()).as("tracked.getBundle() != bundle").isEqualTo(bundle);
 			}
 			Map<Bundle, BundleWrapper> map = bt.getTracked();
-			assertEquals("size() != map.size()", bt.size(), map.size());
+			assertThat(map).as("size() != map.size()").hasSize(bt.size());
 			for (Map.Entry<Bundle, BundleWrapper> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				BundleWrapper tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked
-						.getBundle());
+				assertThat(tracked
+						.getBundle()).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			synchronized (customizerCalled) {
-				assertTrue("adding not called", customizerCalled[0]);
+				assertThat(customizerCalled[0]).as("adding not called").isTrue();
 				customizerCalled[0] = false;
-				assertFalse("modified called", customizerCalled[1]);
-				assertFalse("removed called", customizerCalled[2]);
+				assertThat(customizerCalled[1]).as("modified called").isFalse();
+				assertThat(customizerCalled[2]).as("removed called").isFalse();
 			}
 		}
 		finally {
 			bt.close();
 		}
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		synchronized (customizerCalled) {
-			assertFalse("adding called", customizerCalled[0]);
-			assertFalse("modified called", customizerCalled[1]);
-			assertTrue("removed not called", customizerCalled[2]);
+			assertThat(customizerCalled[0]).as("adding called").isFalse();
+			assertThat(customizerCalled[1]).as("modified called").isFalse();
+			assertThat(customizerCalled[2]).as("removed not called").isTrue();
 			customizerCalled[2] = false;
 		}
 
 		bt.open();
 		try {
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
+			assertThat(bundles).as("getBundles() null").isNotNull();
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				BundleWrapper tracked = bt.getObject(bundle);
-				assertEquals("tracked.getBundle() != bundle", bundle, tracked
-						.getBundle());
+				assertThat(tracked
+						.getBundle()).as("tracked.getBundle() != bundle").isEqualTo(bundle);
 			}
 			Map<Bundle, BundleWrapper> map = bt.getTracked();
-			assertEquals("size() != map.size()", bt.size(), map.size());
+			assertThat(map).as("size() != map.size()").hasSize(bt.size());
 			for (Map.Entry<Bundle, BundleWrapper> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				BundleWrapper tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle, tracked
-						.getBundle());
+				assertThat(tracked
+						.getBundle()).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			synchronized (customizerCalled) {
-				assertTrue("adding not called", customizerCalled[0]);
+				assertThat(customizerCalled[0]).as("adding not called").isTrue();
 				customizerCalled[0] = false;
-				assertFalse("modified called", customizerCalled[1]);
-				assertFalse("removed called", customizerCalled[2]);
+				assertThat(customizerCalled[1]).as("modified called").isFalse();
+				assertThat(customizerCalled[2]).as("removed called").isFalse();
 			}
 
-			Bundle tb1 = install("tb1.jar");
+			Bundle tb1 = installer.installBundle("tb1.jar", false);
 			try {
 				synchronized (customizerCalled) {
-					assertFalse("adding called", customizerCalled[0]);
-					assertFalse("modified called", customizerCalled[1]);
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[0]).as("adding called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				tb1.start();
 				synchronized (customizerCalled) {
-					assertTrue("adding not called", customizerCalled[0]);
+					assertThat(customizerCalled[0]).as("adding not called").isTrue();
 					customizerCalled[0] = false;
-					assertFalse("modified called", customizerCalled[1]);
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				tb1.stop();
 				synchronized (customizerCalled) {
-					assertFalse("adding called", customizerCalled[0]);
-					assertFalse("modified called", customizerCalled[1]);
-					assertTrue("removed not called", customizerCalled[2]);
+					assertThat(customizerCalled[0]).as("adding called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed not called").isTrue();
 					customizerCalled[2] = false;
 				}
 				tb1.start();
 				synchronized (customizerCalled) {
-					assertTrue("adding not called", customizerCalled[0]);
+					assertThat(customizerCalled[0]).as("adding not called").isTrue();
 					customizerCalled[0] = false;
-					assertFalse("modified called", customizerCalled[1]);
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				bt.remove(tb1);
 				synchronized (customizerCalled) {
-					assertFalse("adding called", customizerCalled[0]);
-					assertFalse("modified called", customizerCalled[1]);
-					assertTrue("removed not called", customizerCalled[2]);
+					assertThat(customizerCalled[0]).as("adding called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed not called").isTrue();
 					customizerCalled[2] = false;
 				}
 			}
@@ -350,42 +367,44 @@ public class BundleTrackerTests extends OSGiTestCase {
 			bt.close();
 		}
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		synchronized (customizerCalled) {
-			assertFalse("adding called", customizerCalled[0]);
-			assertFalse("modified called", customizerCalled[1]);
-			assertTrue("removed not called", customizerCalled[2]);
+			assertThat(customizerCalled[0]).as("adding called").isFalse();
+			assertThat(customizerCalled[1]).as("modified called").isFalse();
+			assertThat(customizerCalled[2]).as("removed not called").isTrue();
 			customizerCalled[2] = false;
 		}
 	}
 
+	@Test
 	public void testTrackingCount() {
-		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(getContext(),
+		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(context,
 				Bundle.ACTIVE, null);
-		assertEquals("size not zero", 0, bt.size());
-		assertEquals("tracking count not -1", -1, bt.getTrackingCount());
+		assertThat(bt.size()).as("size not zero").isZero();
+		assertThat(bt.getTrackingCount()).as("tracking count not -1").isEqualTo(-1);
 		bt.open();
 		try {
-			assertTrue("size zero", 0 < bt.size());
+			assertThat(0 < bt.size()).as("size zero").isTrue();
 			int trackingCount = bt.getTrackingCount();
-			assertTrue("tracking count zero", 0 < trackingCount);
+			assertThat(0 < trackingCount).as("tracking count zero").isTrue();
 			Bundle[] bundles = bt.getBundles();
 			for (int i = 0, l = bundles.length; i < l; i++, trackingCount = bt
 					.getTrackingCount()) {
 				bt.remove(bundles[i]);
-				assertTrue("tracking count not incremented", trackingCount < bt
-						.getTrackingCount());
+				assertThat(trackingCount < bt
+						.getTrackingCount()).as("tracking count not incremented").isTrue();
 			}
-			assertEquals("size not zero", 0, bt.size());
+			assertThat(bt.size()).as("size not zero").isZero();
 		}
 		finally {
 			bt.close();
 		}
-		assertEquals("tracking count not -1", -1, bt.getTrackingCount());
+		assertThat(bt.getTrackingCount()).as("tracking count not -1").isEqualTo(-1);
 	}
 
+	@Test
 	public void testEvents() throws Exception {
-		Bundle[] bundles = getContext().getBundles();
+		Bundle[] bundles = context.getBundles();
 		final List<Bundle> extraneousBundles = new ArrayList<Bundle>(
 				bundles.length);
 		for (Bundle b : bundles) {
@@ -394,7 +413,7 @@ public class BundleTrackerTests extends OSGiTestCase {
 			}
 		}
 		final BundleEvent[] events = new BundleEvent[] {null, null, null};
-		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(getContext(),
+		BundleTracker<Bundle> bt = new BundleTracker<Bundle>(context,
 				Bundle.INSTALLED | Bundle.RESOLVED, null) {
 
 			public Bundle addingBundle(Bundle bundle, BundleEvent event) {
@@ -422,75 +441,69 @@ public class BundleTrackerTests extends OSGiTestCase {
 			}
 		};
 		synchronized (events) {
-			assertNull("adding called", events[0]);
-			assertNull("modified called", events[1]);
-			assertNull("removed called", events[2]);
+			assertThat(events[0]).as("adding called").isNull();
+			assertThat(events[1]).as("modified called").isNull();
+			assertThat(events[2]).as("removed called").isNull();
 		}
 		bt.open();
 		try {
 			bundles = bt.getBundles();
-			assertNull("getBundles() not null", bundles);
+			assertThat(bundles).as("getBundles() not null").isNull();
 			synchronized (events) {
-				assertNull("adding called", events[0]);
-				assertNull("modified called", events[1]);
-				assertNull("removed called", events[2]);
+				assertThat(events[0]).as("adding called").isNull();
+				assertThat(events[1]).as("modified called").isNull();
+				assertThat(events[2]).as("removed called").isNull();
 			}
-			Bundle tb1 = install("tb1.jar");
+			Bundle tb1 = installer.installBundle("tb1.jar", false);
 			try {
 				synchronized (events) {
-					assertNotNull("adding not called", events[0]);
-					assertEquals("event type not installed",
-							BundleEvent.INSTALLED, events[0].getType());
-					assertEquals("event bundle not tb1", tb1, events[0]
-							.getBundle());
+					assertThat(events[0]).as("adding not called").isNotNull();
+					assertThat(events[0].getType()).as("event type not installed").isEqualTo(BundleEvent.INSTALLED);
+					assertThat(events[0]
+							.getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 					events[0] = null;
-					assertNull("modified called", events[1]);
-					assertNull("removed called", events[2]);
+					assertThat(events[1]).as("modified called").isNull();
+					assertThat(events[2]).as("removed called").isNull();
 				}
 
 				tb1.start();
 				synchronized (events) {
-					assertNull("adding called", events[0]);
-					assertNotNull("modified not called", events[1]);
-					assertEquals("event type not resolved",
-							BundleEvent.RESOLVED, events[1].getType());
-					assertEquals("event bundle not tb1", tb1, events[1]
-							.getBundle());
+					assertThat(events[0]).as("adding called").isNull();
+					assertThat(events[1]).as("modified not called").isNotNull();
+					assertThat(events[1].getType()).as("event type not resolved").isEqualTo(BundleEvent.RESOLVED);
+					assertThat(events[1]
+							.getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 					events[1] = null;
-					assertNotNull("removed not called", events[2]);
-					assertEquals("event type not started",
-							BundleEvent.STARTING, events[2].getType());
-					assertEquals("event bundle not tb1", tb1, events[2]
-							.getBundle());
+					assertThat(events[2]).as("removed not called").isNotNull();
+					assertThat(events[2].getType()).as("event type not started").isEqualTo(BundleEvent.STARTING);
+					assertThat(events[2]
+							.getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 					events[2] = null;
 				}
 
 				tb1.stop();
 				synchronized (events) {
-					assertNotNull("adding not called", events[0]);
-					assertEquals("event type not installed",
-							BundleEvent.STOPPED, events[0].getType());
-					assertEquals("event bundle not tb1", tb1, events[0]
-							.getBundle());
+					assertThat(events[0]).as("adding not called").isNotNull();
+					assertThat(events[0].getType()).as("event type not installed").isEqualTo(BundleEvent.STOPPED);
+					assertThat(events[0]
+							.getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 					events[0] = null;
-					assertNull("modified called", events[1]);
-					assertNull("removed called", events[2]);
+					assertThat(events[1]).as("modified called").isNull();
+					assertThat(events[2]).as("removed called").isNull();
 				}
 			}
 			finally {
 				tb1.uninstall();
 			}
 			synchronized (events) {
-				assertNull("adding called", events[0]);
-				assertNotNull("modified not called", events[1]);
-				assertEquals("event type not unresolved",
-						BundleEvent.UNRESOLVED, events[1].getType());
-				assertEquals("event bundle not tb1", tb1, events[1].getBundle());
+				assertThat(events[0]).as("adding called").isNull();
+				assertThat(events[1]).as("modified not called").isNotNull();
+				assertThat(events[1].getType()).as("event type not unresolved").isEqualTo(BundleEvent.UNRESOLVED);
+				assertThat(events[1].getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 				events[1] = null;
-				assertNotNull("removed not called", events[2]);
-				assertEquals("event type not uninstalled",
-						BundleEvent.UNINSTALLED, events[2].getType());
-				assertEquals("event bundle not tb1", tb1, events[2].getBundle());
+				assertThat(events[2]).as("removed not called").isNotNull();
+				assertThat(events[2].getType()).as("event type not uninstalled").isEqualTo(BundleEvent.UNINSTALLED);
+				assertThat(events[2].getBundle()).as("event bundle not tb1").isEqualTo(tb1);
 				events[2] = null;
 			}
 		}
@@ -498,18 +511,19 @@ public class BundleTrackerTests extends OSGiTestCase {
 			bt.close();
 		}
 		bundles = bt.getBundles();
-		assertNull("getBundles() not null", bundles);
+		assertThat(bundles).as("getBundles() not null").isNull();
 		synchronized (events) {
-			assertNull("adding called", events[0]);
-			assertNull("modified called", events[1]);
-			assertNull("removed called", events[2]);
+			assertThat(events[0]).as("adding called").isNull();
+			assertThat(events[1]).as("modified called").isNull();
+			assertThat(events[2]).as("removed called").isNull();
 		}
 	}
 
+	@Test
 	public void testModified() throws Exception {
 		final boolean[] customizerCalled = new boolean[] {false, false, false};
 		BundleTracker<BundleWrapper> bt = new BundleTracker<BundleWrapper>(
-				getContext(), Bundle.INSTALLED | Bundle.RESOLVED
+				context, Bundle.INSTALLED | Bundle.RESOLVED
 						| Bundle.STARTING | Bundle.ACTIVE | Bundle.STOPPING,
 				new BundleTrackerCustomizer<BundleWrapper>() {
 
@@ -538,78 +552,76 @@ public class BundleTrackerTests extends OSGiTestCase {
 				});
 
 		synchronized (customizerCalled) {
-			assertFalse("adding called", customizerCalled[0]);
-			assertFalse("modified called", customizerCalled[1]);
-			assertFalse("removed called", customizerCalled[2]);
+			assertThat(customizerCalled[0]).as("adding called").isFalse();
+			assertThat(customizerCalled[1]).as("modified called").isFalse();
+			assertThat(customizerCalled[2]).as("removed called").isFalse();
 		}
 
 		Bundle[] bundles;
 		bt.open();
 		try {
 			bundles = bt.getBundles();
-			assertNotNull("getBundles() null", bundles);
+			assertThat(bundles).as("getBundles() null").isNotNull();
 			for (int i = 0, l = bundles.length; i < l; i++) {
 				Bundle bundle = bundles[i];
 				BundleWrapper tracked = bt.getObject(bundle);
-				assertEquals("tracked.getBundle() != bundle", bundle,
-						tracked.getBundle());
+				assertThat(tracked.getBundle()).as("tracked.getBundle() != bundle").isEqualTo(bundle);
 			}
 			Map<Bundle, BundleWrapper> map = bt.getTracked();
-			assertEquals("size() != map.size()", bt.size(), map.size());
+			assertThat(map).as("size() != map.size()").hasSize(bt.size());
 			for (Map.Entry<Bundle, BundleWrapper> e : map.entrySet()) {
 				Bundle bundle = e.getKey();
 				BundleWrapper tracked = e.getValue();
-				assertEquals("default tracked != bundle", bundle,
-						tracked.getBundle());
+				assertThat(tracked.getBundle()).as("default tracked != bundle").isEqualTo(bundle);
 			}
 			synchronized (customizerCalled) {
-				assertTrue("adding not called", customizerCalled[0]);
+				assertThat(customizerCalled[0]).as("adding not called").isTrue();
 				customizerCalled[0] = false;
-				assertFalse("modified called", customizerCalled[1]);
-				assertFalse("removed called", customizerCalled[2]);
+				assertThat(customizerCalled[1]).as("modified called").isFalse();
+				assertThat(customizerCalled[2]).as("removed called").isFalse();
 			}
 
-			Bundle tb1 = install("tb1.jar");
+			Bundle tb1 = installer.installBundle("tb1.jar", false);
 			try {
 				synchronized (customizerCalled) {
-					assertTrue("adding called", customizerCalled[0]);
+					assertThat(customizerCalled[0]).as("adding called").isTrue();
 					customizerCalled[0] = false;
-					assertFalse("modified called", customizerCalled[1]);
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
-				Wiring.resolveBundles(getContext(), tb1);
+				context.getBundle(0).adapt(FrameworkWiring.class).resolveBundles(Arrays.asList(tb1));
 				synchronized (customizerCalled) {
-					assertFalse("adding not called", customizerCalled[0]);
-					assertTrue("modified called", customizerCalled[1]);
+					assertThat(customizerCalled[0]).as("adding not called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isTrue();
 					customizerCalled[1] = false;
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				tb1.start();
 				synchronized (customizerCalled) {
-					assertFalse("adding not called", customizerCalled[0]);
-					assertTrue("modified called", customizerCalled[1]);
+					assertThat(customizerCalled[0]).as("adding not called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isTrue();
 					customizerCalled[1] = false;
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				tb1.stop();
 				synchronized (customizerCalled) {
-					assertFalse("adding not called", customizerCalled[0]);
-					assertTrue("modified called", customizerCalled[1]);
+					assertThat(customizerCalled[0]).as("adding not called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isTrue();
 					customizerCalled[1] = false;
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				tb1.start();
 				synchronized (customizerCalled) {
-					assertFalse("adding not called", customizerCalled[0]);
-					assertTrue("modified called", customizerCalled[1]);
+					assertThat(customizerCalled[0]).as("adding not called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isTrue();
 					customizerCalled[1] = false;
-					assertFalse("removed called", customizerCalled[2]);
+					assertThat(customizerCalled[2]).as("removed called").isFalse();
 				}
 				bt.remove(tb1);
 				synchronized (customizerCalled) {
-					assertFalse("adding called", customizerCalled[0]);
-					assertFalse("modified called", customizerCalled[1]);
-					assertTrue("removed not called", customizerCalled[2]);
+					assertThat(customizerCalled[0]).as("adding called").isFalse();
+					assertThat(customizerCalled[1]).as("modified called").isFalse();
+					assertThat(customizerCalled[2]).as("removed not called").isTrue();
 					customizerCalled[2] = false;
 				}
 			}
